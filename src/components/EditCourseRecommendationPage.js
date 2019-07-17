@@ -1,15 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import CourseRecommendationForm from './CourseRecommendationForm';
-import { startEditCourseRecommendation, startRemoveCourseRecommendation } from '../actions/courserecommendations';
+import { startEditCourseRecommendation } from '../actions/courseRecommendations';
 
 export class EditCourseRecommendationPage extends React.Component {
   onSubmit = (courserecommendation) => {
     this.props.startEditCourseRecommendation(this.props.courserecommendation.id, courserecommendation);
-    this.props.history.push('/');
-  };
-  onRemove = () => {
-    this.props.startRemoveCourseRecommendation({ id: this.props.courserecommendation.id });
     this.props.history.push('/');
   };
   render() {
