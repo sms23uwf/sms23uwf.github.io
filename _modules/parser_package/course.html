@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>parser_package.course &#8212; Scholacity Parser 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for parser_package.course</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    course.py</span>
+<span class="sd">    --------------</span>
+
+<span class="sd">    The Course class represents a Course record in the database.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Steven M. Satterfield&quot;</span>
+
+
+<div class="viewcode-block" id="Course"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course">[docs]</a><span class="k">class</span> <span class="nc">Course</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgeAreaId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_catalogId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgearea</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tocEntry</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<div class="viewcode-block" id="Course.getId"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.getId">[docs]</a>    <span class="k">def</span> <span class="nf">getId</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span></div>
+
+<div class="viewcode-block" id="Course.setId"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.setId">[docs]</a>    <span class="k">def</span> <span class="nf">setId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span></div>
+
+<div class="viewcode-block" id="Course.getKnowledgeAreaId"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.getKnowledgeAreaId">[docs]</a>    <span class="k">def</span> <span class="nf">getKnowledgeAreaId</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgeAreaId</span></div>
+
+<div class="viewcode-block" id="Course.setKnowledgeAreaId"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.setKnowledgeAreaId">[docs]</a>    <span class="k">def</span> <span class="nf">setKnowledgeAreaId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">knowledgeAreaId</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgeAreaId</span> <span class="o">=</span> <span class="n">knowledgeAreaId</span></div>
+
+<div class="viewcode-block" id="Course.getKnowledgeArea"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.getKnowledgeArea">[docs]</a>    <span class="k">def</span> <span class="nf">getKnowledgeArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgearea</span></div>
+
+<div class="viewcode-block" id="Course.setKnowledgeArea"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.setKnowledgeArea">[docs]</a>    <span class="k">def</span> <span class="nf">setKnowledgeArea</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">knowledgearea</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgearea</span> <span class="o">=</span> <span class="n">knowledgearea</span></div>
+
+<div class="viewcode-block" id="Course.getCatalogId"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.getCatalogId">[docs]</a>    <span class="k">def</span> <span class="nf">getCatalogId</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalogId</span></div>
+
+<div class="viewcode-block" id="Course.setCatalogId"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.setCatalogId">[docs]</a>    <span class="k">def</span> <span class="nf">setCatalogId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">catalogId</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_catalogId</span> <span class="o">=</span> <span class="n">catalogId</span></div>
+
+<div class="viewcode-block" id="Course.getTitle"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.getTitle">[docs]</a>    <span class="k">def</span> <span class="nf">getTitle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_title</span></div>
+
+<div class="viewcode-block" id="Course.setTitle"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.setTitle">[docs]</a>    <span class="k">def</span> <span class="nf">setTitle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_title</span> <span class="o">=</span> <span class="n">title</span></div>
+
+<div class="viewcode-block" id="Course.getTOCEntry"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.getTOCEntry">[docs]</a>    <span class="k">def</span> <span class="nf">getTOCEntry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tocEntry</span></div>
+
+<div class="viewcode-block" id="Course.setTOCEntry"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.setTOCEntry">[docs]</a>    <span class="k">def</span> <span class="nf">setTOCEntry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tocEntry</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tocEntry</span> <span class="o">=</span> <span class="n">tocEntry</span></div>
+
+<div class="viewcode-block" id="Course.getDescription"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.getDescription">[docs]</a>    <span class="k">def</span> <span class="nf">getDescription</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span></div>
+
+<div class="viewcode-block" id="Course.setDescription"><a class="viewcode-back" href="../../parser_package.html#parser_package.course.Course.setDescription">[docs]</a>    <span class="k">def</span> <span class="nf">setDescription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Scholacity Parser</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../parser_package.html">parser_package package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Satterfield.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

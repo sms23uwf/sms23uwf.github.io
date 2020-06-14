@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>parser_package.paragraph &#8212; Scholacity Parser 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for parser_package.paragraph</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Jan 20 18:25:35 2020</span>
+
+<span class="sd">@author: Steven M. Satterfield</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Run"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Run">[docs]</a><span class="k">class</span> <span class="nc">Run</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_font</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bold</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_italic</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        
+<div class="viewcode-block" id="Run.getFont"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Run.getFont">[docs]</a>    <span class="k">def</span> <span class="nf">getFont</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_font</span></div>
+    
+<div class="viewcode-block" id="Run.setFont"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Run.setFont">[docs]</a>    <span class="k">def</span> <span class="nf">setFont</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">font</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_font</span> <span class="o">=</span> <span class="n">font</span></div>
+
+<div class="viewcode-block" id="Run.getBold"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Run.getBold">[docs]</a>    <span class="k">def</span> <span class="nf">getBold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bold</span></div>
+    
+<div class="viewcode-block" id="Run.setBold"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Run.setBold">[docs]</a>    <span class="k">def</span> <span class="nf">setBold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bold</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bold</span> <span class="o">=</span> <span class="n">bold</span></div>
+
+<div class="viewcode-block" id="Run.getItalic"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Run.getItalic">[docs]</a>    <span class="k">def</span> <span class="nf">getItalic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_italic</span></div>
+    
+<div class="viewcode-block" id="Run.setItalic"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Run.setItalic">[docs]</a>    <span class="k">def</span> <span class="nf">setItalic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">italic</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_italic</span> <span class="o">=</span> <span class="n">italic</span></div></div>
+
+
+<div class="viewcode-block" id="Paragraph"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph">[docs]</a><span class="k">class</span> <span class="nc">Paragraph</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_style</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_styleType</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_styleId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_format</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runs</span> <span class="o">=</span> <span class="p">[]</span>
+        
+<div class="viewcode-block" id="Paragraph.getNumber"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getNumber">[docs]</a>    <span class="k">def</span> <span class="nf">getNumber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_number</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setNumber"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setNumber">[docs]</a>    <span class="k">def</span> <span class="nf">setNumber</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">number</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_number</span> <span class="o">=</span> <span class="n">number</span></div>
+        
+<div class="viewcode-block" id="Paragraph.getStyle"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getStyle">[docs]</a>    <span class="k">def</span> <span class="nf">getStyle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_style</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setStyle"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setStyle">[docs]</a>    <span class="k">def</span> <span class="nf">setStyle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_style</span> <span class="o">=</span> <span class="n">style</span></div>
+
+<div class="viewcode-block" id="Paragraph.getStyleType"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getStyleType">[docs]</a>    <span class="k">def</span> <span class="nf">getStyleType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_styleType</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setStyleType"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setStyleType">[docs]</a>    <span class="k">def</span> <span class="nf">setStyleType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">styleType</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_styleType</span> <span class="o">=</span> <span class="n">styleType</span></div>
+
+<div class="viewcode-block" id="Paragraph.getStyleId"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getStyleId">[docs]</a>    <span class="k">def</span> <span class="nf">getStyleId</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_styleId</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setStyleId"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setStyleId">[docs]</a>    <span class="k">def</span> <span class="nf">setStyleId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">styleId</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_styleId</span> <span class="o">=</span> <span class="n">styleId</span></div>
+
+<div class="viewcode-block" id="Paragraph.getFormat"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getFormat">[docs]</a>    <span class="k">def</span> <span class="nf">getFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setFormat"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setFormat">[docs]</a>    <span class="k">def</span> <span class="nf">setFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_format</span> <span class="o">=</span> <span class="nb">format</span></div>
+
+<div class="viewcode-block" id="Paragraph.getHeader"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getHeader">[docs]</a>    <span class="k">def</span> <span class="nf">getHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setHeader"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setHeader">[docs]</a>    <span class="k">def</span> <span class="nf">setHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">header</span></div>
+        
+<div class="viewcode-block" id="Paragraph.getText"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getText">[docs]</a>    <span class="k">def</span> <span class="nf">getText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_text</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setText"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setText">[docs]</a>    <span class="k">def</span> <span class="nf">setText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_text</span> <span class="o">=</span> <span class="n">text</span></div>
+        
+<div class="viewcode-block" id="Paragraph.getRunCount"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getRunCount">[docs]</a>    <span class="k">def</span> <span class="nf">getRunCount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runCount</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setRunCount"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setRunCount">[docs]</a>    <span class="k">def</span> <span class="nf">setRunCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runCount</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runCount</span> <span class="o">=</span> <span class="n">runCount</span></div>
+        
+<div class="viewcode-block" id="Paragraph.getRuns"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.getRuns">[docs]</a>    <span class="k">def</span> <span class="nf">getRuns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runs</span></div>
+    
+<div class="viewcode-block" id="Paragraph.setRuns"><a class="viewcode-back" href="../../parser_package.html#parser_package.paragraph.Paragraph.setRuns">[docs]</a>    <span class="k">def</span> <span class="nf">setRuns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run</span><span class="p">)</span></div></div>
+    
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Scholacity Parser</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../parser_package.html">parser_package package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Satterfield.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

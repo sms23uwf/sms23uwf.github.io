@@ -1,0 +1,753 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>parser_package.parse_catalog_into_database &#8212; Scholacity Parser 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for parser_package.parse_catalog_into_database</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    parse_catalog_into_database.py</span>
+<span class="sd">    --------------------------------</span>
+
+<span class="sd">    This module contains a set of functions that implement the extraction</span>
+<span class="sd">    of the Knowledge Areas, Courses, and stated Learning Outcomes from a</span>
+<span class="sd">    Course Catalog and inserts them into a Database.</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Steven M. Satterfield&quot;</span>
+
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">docx</span> <span class="kn">import</span> <span class="n">Document</span>
+<span class="kn">from</span> <span class="nn">textblob</span> <span class="kn">import</span> <span class="n">TextBlob</span>
+<span class="kn">from</span> <span class="nn">firebase</span> <span class="kn">import</span> <span class="n">firebase</span>
+
+<span class="kn">from</span> <span class="nn">parser_package.catalog</span> <span class="kn">import</span> <span class="n">Catalog</span>
+<span class="kn">from</span> <span class="nn">parser_package.knowledgearea</span> <span class="kn">import</span> <span class="n">KnowledgeArea</span>
+<span class="kn">from</span> <span class="nn">parser_package.course</span> <span class="kn">import</span> <span class="n">Course</span>
+<span class="kn">from</span> <span class="nn">parser_package.learningobjective</span> <span class="kn">import</span> <span class="n">LearningObjective</span>
+<span class="kn">from</span> <span class="nn">parser_package.paragraph</span> <span class="kn">import</span> <span class="n">Paragraph</span>
+<span class="kn">import</span> <span class="nn">parser_package.constant</span>
+
+
+<span class="n">existingCatalogRecords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">existingKnowledgeAreas</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">firstPositionOfCKA</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">currentKnowledgeArea</span> <span class="o">=</span> <span class="n">KnowledgeArea</span><span class="p">()</span>
+<span class="n">courseNameStyles</span> <span class="o">=</span> <span class="p">[</span><span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_NORMAL</span><span class="p">,</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_HEADING</span><span class="p">]</span>
+
+<span class="n">firebase</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">FirebaseApplication</span><span class="p">(</span><span class="s1">&#39;https://scholacity-org-test.firebaseio.com/&#39;</span><span class="p">)</span>
+
+<span class="n">document</span> <span class="o">=</span> <span class="n">Document</span><span class="p">(</span><span class="s1">&#39;../Catalogs/Fall2019_LLFullCatalog.docx&#39;</span><span class="p">)</span>
+<span class="n">documentName</span> <span class="o">=</span> <span class="s2">&quot;Fall2019_LLFullCatalog.docx&quot;</span>
+<span class="n">documentSemester</span> <span class="o">=</span> <span class="s2">&quot;Fall&quot;</span>
+<span class="n">documentYear</span> <span class="o">=</span> <span class="s2">&quot;2019&quot;</span>
+
+<span class="c1"># document = Document(&#39;Spring2020_LeisureLearningCatalogFULL.docx&#39;)</span>
+<span class="c1"># documentName = &quot;Spring2020_LeisureLearningCatalogFULL.docx&quot;</span>
+<span class="c1"># documentSemester = &quot;Spring&quot;</span>
+<span class="c1"># documentYear = &quot;2020&quot;</span>
+
+
+<span class="n">knowledgeAreas</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">courses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">learningObjectives</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">paragraphs1</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">paragraphs2</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="getMatchingKnowledgeArea"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.getMatchingKnowledgeArea">[docs]</a><span class="k">def</span> <span class="nf">getMatchingKnowledgeArea</span><span class="p">(</span><span class="n">candidate</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">KnowledgeArea</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find matching knowledge area and return the Knowledge Area as a string.</span>
+
+<span class="sd">        :param candidate: a string representing an extracted paragraph that</span>
+<span class="sd">         we want to check to see if it matches a Knowledge Area.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">knowledgearea</span> <span class="ow">in</span> <span class="n">knowledgeAreas</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">knowledgearea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">knowledgearea</span>
+
+    <span class="k">return</span> <span class="n">KnowledgeArea</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ParagraphIsKnowledgeArea"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.ParagraphIsKnowledgeArea">[docs]</a><span class="k">def</span> <span class="nf">ParagraphIsKnowledgeArea</span><span class="p">(</span><span class="n">pdocument</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">Paragraph</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lastPos</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">pText</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine if the content of a paragraph consists of a Knowledge Area.</span>
+<span class="sd">        Return a boolean and a string.</span>
+
+<span class="sd">        :param pdocument: a Python Docx Document object containing the document we are parsing.</span>
+<span class="sd">        :param p: a Python Docx Paragraph object containing the paragraph under examination.</span>
+<span class="sd">        :param i: the integer representing a position in the enumeration of the paragraphs.</span>
+<span class="sd">        :param lasPos: an integer representing the position of the last character in the paragraph.</span>
+<span class="sd">        :param pText: a string containing the text from the paragraph.</span>
+
+<span class="sd">        :return a Tuple containing the boolean value and the string representing the Knowledge Area.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">firstPositionOfCKA</span>
+
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_KNOWLEDGEAREA</span> <span class="ow">and</span> <span class="n">pText</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="n">pText</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="n">pPrev</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">pPrevText</span> <span class="o">=</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">pPrevLasPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pPrevText</span><span class="p">)</span>
+
+        <span class="n">pPrevRunCount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pPrev</span><span class="o">.</span><span class="n">runs</span><span class="p">)</span>
+
+        <span class="n">pPrevIsBold</span> <span class="o">=</span> <span class="s1">&#39;false&#39;</span>
+        <span class="k">if</span> <span class="n">pPrevRunCount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">pPrevIsBold</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span> <span class="k">if</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bold</span> <span class="k">else</span> <span class="s1">&#39;false&#39;</span>
+
+        <span class="k">if</span> <span class="n">pPrevIsBold</span> <span class="o">==</span> <span class="s1">&#39;false&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pPrevRunCount</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">pPrevIsBold</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span> <span class="k">if</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bold</span> <span class="k">else</span> <span class="s1">&#39;false&#39;</span>
+
+        <span class="k">if</span> <span class="n">pPrevText</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">constant</span><span class="o">.</span><span class="n">STYLE_NORMAL</span> <span class="ow">and</span> <span class="n">pPrevIsBold</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pPrevText</span><span class="p">[</span><span class="n">pPrevLasPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">firstPositionOfCKA</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">firstPositionOfCKA</span> <span class="o">=</span> <span class="n">i</span>
+
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pPrevText</span>
+
+    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GetExistingCatalogRecords"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.GetExistingCatalogRecords">[docs]</a><span class="k">def</span> <span class="nf">GetExistingCatalogRecords</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">documentName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">documentSemester</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">documentYear</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get existing catalog records from database and insert into global collection.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+<span class="sd">        :param documentName: a string representing the catalog document name</span>
+<span class="sd">        :param documentSemester: a string representation of the catalog academic semester</span>
+<span class="sd">        :param documentYear: a string representation of the catalog year</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">existingCatalogRecords</span>
+
+    <span class="n">obj_key_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/Catalog&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">obj_key_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj_key_list</span><span class="p">:</span>
+        <span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+        <span class="n">catalog</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">catalog</span><span class="o">.</span><span class="n">setDocumentName</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;document_name&#39;</span><span class="p">])</span>
+        <span class="n">catalog</span><span class="o">.</span><span class="n">setSemester</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;semester&#39;</span><span class="p">])</span>
+        <span class="n">catalog</span><span class="o">.</span><span class="n">setYear</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
+        <span class="n">existingCatalogRecords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">catalog</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExtractCatalogRecord"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.ExtractCatalogRecord">[docs]</a><span class="k">def</span> <span class="nf">ExtractCatalogRecord</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">documentName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">documentSemester</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">documentYear</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Look if catalog record exists, if not - write it.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+<span class="sd">        :param documentName: a string representing the catalog document name</span>
+<span class="sd">        :param documentSemester: a string representation of the catalog academic semester</span>
+<span class="sd">        :param documentYear: a string representation of the catalog year</span>
+
+<span class="sd">        :return Catalog object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+    <span class="n">catalog</span><span class="o">.</span><span class="n">setDocumentName</span><span class="p">(</span><span class="n">documentName</span><span class="p">)</span>
+    <span class="n">catalog</span><span class="o">.</span><span class="n">setSemester</span><span class="p">(</span><span class="n">documentSemester</span><span class="p">)</span>
+    <span class="n">catalog</span><span class="o">.</span><span class="n">setYear</span><span class="p">(</span><span class="n">documentYear</span><span class="p">)</span>
+
+    <span class="n">existingKey</span> <span class="o">=</span> <span class="n">FindExistingCatalogId</span><span class="p">(</span><span class="n">catalog</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">existingKey</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">newCatalogRecord</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;document_name&#39;</span><span class="p">:</span> <span class="n">documentName</span><span class="p">,</span>
+            <span class="s1">&#39;semester&#39;</span><span class="p">:</span> <span class="n">documentSemester</span><span class="p">,</span>
+            <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">documentYear</span>
+        <span class="p">}</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;Catalog&#39;</span><span class="p">,</span> <span class="n">newCatalogRecord</span><span class="p">)</span>
+        <span class="n">catalog</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">catalog</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">existingKey</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">catalog</span></div>
+
+
+<div class="viewcode-block" id="FindExistingCatalogId"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.FindExistingCatalogId">[docs]</a><span class="k">def</span> <span class="nf">FindExistingCatalogId</span><span class="p">(</span><span class="n">newCatalogRecord</span><span class="p">:</span> <span class="n">Catalog</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Look for existing Catalog Record and get the Id.</span>
+
+<span class="sd">        :param newCatalogRecord: a Catalog object</span>
+
+<span class="sd">        :return string representation of Id or empty string if not found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">existingCatalogRecords</span>
+
+    <span class="k">for</span> <span class="n">existingCatalogRecord</span> <span class="ow">in</span> <span class="n">existingCatalogRecords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">existingCatalogRecord</span><span class="o">.</span><span class="n">getDocumentName</span><span class="p">()</span> <span class="o">==</span> <span class="n">newCatalogRecord</span><span class="o">.</span><span class="n">getDocumentName</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">existingCatalogRecord</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GetExistingKnowledgeAreas"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.GetExistingKnowledgeAreas">[docs]</a><span class="k">def</span> <span class="nf">GetExistingKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get existing KnowledgeAreas from the database and</span>
+<span class="sd">        insert them into the global collection.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+<span class="sd">        :param document: a Python-Docx Document object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">existingKnowledgeAreas</span>
+
+    <span class="n">obj_key_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/KnowledgeArea&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">obj_key_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj_key_list</span><span class="p">:</span>
+        <span class="n">knowledgeArea</span> <span class="o">=</span> <span class="n">KnowledgeArea</span><span class="p">()</span>
+        <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Content&#39;</span><span class="p">])</span>
+        <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">existingKnowledgeAreas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knowledgeArea</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExtractKnowledgeAreas"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.ExtractKnowledgeAreas">[docs]</a><span class="k">def</span> <span class="nf">ExtractKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span> <span class="n">knowledgeAreas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">KnowledgeArea</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the KnowledgeAreas in the document and</span>
+<span class="sd">        insert them into a database table.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+<span class="sd">        :param document: a Python-Docx Document object</span>
+<span class="sd">        :param knowledgeAreas: a List of KnowledgeArea objects</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">firstPositionOfCKA</span>
+    <span class="n">firstPositionOfCKA</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">document</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">):</span>
+        <span class="n">pText</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">lastPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pText</span><span class="p">)</span>
+        <span class="n">kaText</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">isKnowledgeArea</span><span class="p">,</span> <span class="n">kaText</span> <span class="o">=</span> <span class="n">ParagraphIsKnowledgeArea</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">lastPos</span><span class="p">,</span> <span class="n">pText</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">isKnowledgeArea</span> <span class="ow">and</span> <span class="n">kaText</span><span class="p">:</span>
+            <span class="n">knowledgeArea</span> <span class="o">=</span> <span class="n">KnowledgeArea</span><span class="p">()</span>
+            <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">kaText</span><span class="p">)</span>
+            <span class="n">knowledgeAreas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knowledgeArea</span><span class="p">)</span>
+
+        <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">firstPositionOfCKA</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">firstPositionOfCKA</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">120</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="k">for</span> <span class="n">knowledgeArea</span> <span class="ow">in</span> <span class="n">knowledgeAreas</span><span class="p">:</span>
+        <span class="n">newKnowledgeArea</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Content&#39;</span><span class="p">:</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">existingKey</span> <span class="o">=</span> <span class="n">FindExistingKnowledgeAreaId</span><span class="p">(</span><span class="n">knowledgeArea</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">existingKey</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;KnowledgeArea&#39;</span><span class="p">,</span> <span class="n">newKnowledgeArea</span><span class="p">)</span>
+            <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">existingKey</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FindExistingKnowledgeAreaId"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.FindExistingKnowledgeAreaId">[docs]</a><span class="k">def</span> <span class="nf">FindExistingKnowledgeAreaId</span><span class="p">(</span><span class="n">newKnowledgeArea</span><span class="p">:</span> <span class="n">KnowledgeArea</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find existing KnowledgeArea in the global collection.</span>
+<span class="sd">        If found, get the Id.</span>
+
+<span class="sd">        :param newKnowledgeArea: a KnowledgeArea object</span>
+
+<span class="sd">        :return string representation of the Id</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">existingKnowledgeAreas</span>
+
+    <span class="k">for</span> <span class="n">existingKnowledgeArea</span> <span class="ow">in</span> <span class="n">existingKnowledgeAreas</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">existingKnowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span> <span class="o">==</span> <span class="n">newKnowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">existingKnowledgeArea</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ExtractCourseAndDescription"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.ExtractCourseAndDescription">[docs]</a><span class="k">def</span> <span class="nf">ExtractCourseAndDescription</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span> <span class="n">knowledgeAreas</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">KnowledgeArea</span><span class="p">],</span> <span class="n">courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">],</span> <span class="n">catalogId</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a list of courses with Foreign Key back to KnowledgeArea</span>
+<span class="sd">        and insert them into the database.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+<span class="sd">        :param document: a Python-Docx Document object</span>
+<span class="sd">        :param knowledgeAreas: a List of KnowledgeArea objects</span>
+<span class="sd">        :param courses: a List of Course objects</span>
+<span class="sd">        :param catalogId: a string representation of the current Catalog Id</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">currentKnowledgeArea</span>
+
+    <span class="n">knowledgeAreaId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">knowledgeAreaTitle</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">candidateId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">partialTitle</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fulltitle</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">courseNameStyles</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_NORMAL</span><span class="p">:</span>
+            <span class="n">currentKnowledgeArea</span> <span class="o">=</span> <span class="n">getMatchingKnowledgeArea</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">candidateId</span> <span class="o">=</span> <span class="n">currentKnowledgeArea</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">candidateId</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">knowledgeAreaId</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">candidateId</span><span class="p">)</span>
+                <span class="n">knowledgeAreaTitle</span> <span class="o">=</span> <span class="n">currentKnowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;knowledgeAreaId:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">knowledgeAreaId</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">knowledgeAreaId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">knowledgeAreaId</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="n">knowledgeAreaTitle</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">pText</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">lastPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pText</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pText</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">partialTitle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">partialTitle</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">partialTitle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                    <span class="n">fulltitle</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">partialTitle</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fulltitle</span> <span class="o">=</span> <span class="n">pText</span>
+
+                <span class="n">fulltitle</span> <span class="o">=</span> <span class="n">fulltitle</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="p">()</span>
+                <span class="n">course</span><span class="o">.</span><span class="n">setKnowledgeAreaId</span><span class="p">(</span><span class="n">knowledgeAreaId</span><span class="p">)</span>
+                <span class="n">course</span><span class="o">.</span><span class="n">setKnowledgeArea</span><span class="p">(</span><span class="n">currentKnowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+                <span class="n">course</span><span class="o">.</span><span class="n">setTOCEntry</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">course</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">fulltitle</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+                <span class="n">partialTitle</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">ExtractCourseDescriptions</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">courses</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">pNumber</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">descriptionElements</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
+                <span class="n">pNumber</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">courseNameStyles</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">pText</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New! &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">())</span> <span class="ow">or</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">pText</span><span class="p">):</span>
+                        <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">takeDescription</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;Sessions&quot;</span><span class="p">):</span>
+                            <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">takeDescription</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;Magic&quot;</span><span class="p">):</span>
+                            <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_BODY_TEXT</span> <span class="ow">and</span> <span class="n">takeDescription</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">descriptionElements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+            <span class="n">fullDescription</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">descriptionElements</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">fullDescription</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descriptionElements</span><span class="p">)</span>
+
+            <span class="n">course</span><span class="o">.</span><span class="n">setDescription</span><span class="p">(</span><span class="n">fullDescription</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeArea</span><span class="p">()</span> <span class="o">==</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">():</span>
+            <span class="k">continue</span>
+
+        <span class="n">newCourse</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;CatalogId&#39;</span><span class="p">:</span> <span class="n">catalogId</span><span class="p">,</span>
+            <span class="s1">&#39;KnowledgeAreaId&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeAreaId</span><span class="p">(),</span>
+            <span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">(),</span>
+            <span class="s1">&#39;Description&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;Course&#39;</span><span class="p">,</span> <span class="n">newCourse</span><span class="p">)</span>
+        <span class="n">course</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HeaderIsCourseTitle"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.HeaderIsCourseTitle">[docs]</a><span class="k">def</span> <span class="nf">HeaderIsCourseTitle</span><span class="p">(</span><span class="n">candidate</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare candidate string with every course title until match is</span>
+<span class="sd">        found or end of list.</span>
+
+<span class="sd">        :param candidate: a string representation of a candidate course title</span>
+
+<span class="sd">        :return boolean</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">candidate</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New!&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+
+        <span class="n">compareThis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">lastPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">courseTitle</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">courseTitle</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span> <span class="ow">or</span> <span class="n">candidate</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">courseTitle</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">courseTitle</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ele</span> <span class="ow">in</span> <span class="n">candidate</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">compareThis</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">titlePart</span> <span class="ow">in</span> <span class="n">compareThis</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">titlePart</span> <span class="ow">in</span> <span class="n">candidate</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="GetAssociatedCourse"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.GetAssociatedCourse">[docs]</a><span class="k">def</span> <span class="nf">GetAssociatedCourse</span><span class="p">(</span><span class="n">courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">],</span> <span class="n">candidate</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Course</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare candidate string with every course title until match is</span>
+<span class="sd">        found or end of list.</span>
+
+<span class="sd">        :param candidate: a string representation of a candidate course title</span>
+
+<span class="sd">        :return Course object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">candidate</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New! &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+
+        <span class="n">compareThis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">lastPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">courseTitle</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">courseTitle</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">courseTitle</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ele</span> <span class="ow">in</span> <span class="n">candidate</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">compareThis</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">course</span>
+
+    <span class="n">nullCourse</span> <span class="o">=</span> <span class="n">Course</span><span class="p">()</span>
+    <span class="n">nullCourse</span><span class="o">.</span><span class="n">setKnowledgeArea</span> <span class="o">=</span> <span class="s2">&quot;No Match&quot;</span>
+    <span class="n">nullCourse</span><span class="o">.</span><span class="n">setTOCEntry</span> <span class="o">=</span> <span class="s2">&quot;No Match&quot;</span>
+    <span class="n">nullCourse</span><span class="o">.</span><span class="n">setTitle</span> <span class="o">=</span> <span class="s2">&quot;No Match&quot;</span>
+    <span class="k">return</span> <span class="n">nullCourse</span></div>
+
+
+<div class="viewcode-block" id="ExtractCourseDescriptions"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.ExtractCourseDescriptions">[docs]</a><span class="k">def</span> <span class="nf">ExtractCourseDescriptions</span><span class="p">(</span><span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span> <span class="n">courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract the course descriptions from the document.</span>
+<span class="sd">        Write them to the appropriate Course records in the</span>
+<span class="sd">        database.</span>
+
+<span class="sd">        :param document: a Python-Docx Document object</span>
+<span class="sd">        :param courses: a List of Course objects</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">courseDescriptionOn</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">allparagraphs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pertinentParagraphs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pHeader</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">headerIsCourseTitle</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">partialTitle</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">global</span> <span class="n">courseNameStyles</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+
+            <span class="n">pText</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">lastPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pText</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">pText</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
+                <span class="n">partialTitle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pText</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">partialTitle</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">partialTitle</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+            <span class="n">number</span> <span class="o">=</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">paragraph</span> <span class="o">=</span> <span class="n">Paragraph</span><span class="p">()</span>
+            <span class="n">paragraph</span><span class="o">.</span><span class="n">setNumber</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+            <span class="n">paragraph</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">paragraph</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">))</span>
+            <span class="n">allparagraphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">paragraph</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">allparagraphs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">getStyle</span><span class="p">()</span> <span class="o">==</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_BODY_TEXT</span><span class="p">:</span>
+            <span class="n">pPrev</span> <span class="o">=</span> <span class="n">allparagraphs</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">pHeader</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">getStyle</span><span class="p">()</span> <span class="ow">in</span> <span class="n">courseNameStyles</span><span class="p">:</span>
+                <span class="n">number</span> <span class="o">=</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">p2</span> <span class="o">=</span> <span class="n">Paragraph</span><span class="p">()</span>
+                <span class="n">p2</span><span class="o">.</span><span class="n">setNumber</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+                <span class="n">p2</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span><span class="n">pPrev</span><span class="o">.</span><span class="n">getStyle</span><span class="p">())</span>
+                <span class="n">p2</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">pPrev</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+                <span class="n">paragraphs2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+                <span class="n">pHeader</span> <span class="o">=</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">pHeader</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">headerIsCourseTitle</span> <span class="o">=</span> <span class="n">HeaderIsCourseTitle</span><span class="p">(</span><span class="n">pHeader</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">headerIsCourseTitle</span><span class="p">:</span>
+                <span class="n">number</span> <span class="o">=</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">pc</span> <span class="o">=</span> <span class="n">Paragraph</span><span class="p">()</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">setNumber</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">getStyle</span><span class="p">())</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="n">pHeader</span><span class="p">)</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+                <span class="n">pertinentParagraphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pc</span><span class="p">)</span>
+
+    <span class="n">associatedCourse</span> <span class="o">=</span> <span class="n">Course</span><span class="p">()</span>
+    <span class="n">currentCourseDescription</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">courseTitlePosition</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pertinentParagraphs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">getHeader</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">courseDescriptionOn</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">courseTitlePosition</span><span class="p">:</span>
+            <span class="n">associatedCourse</span><span class="o">.</span><span class="n">setDescription</span><span class="p">(</span><span class="n">currentCourseDescription</span><span class="p">)</span>
+            <span class="n">courseDescriptionOn</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">currentCourseDescription</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">courseTitlePosition</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">getHeader</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">courseDescriptionOn</span><span class="p">:</span>
+            <span class="n">courseDescriptionOn</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">associatedCourse</span> <span class="o">=</span> <span class="n">GetAssociatedCourse</span><span class="p">(</span><span class="n">courses</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">getHeader</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">courseTitlePosition</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">currentCourseDescription</span> <span class="o">+=</span> <span class="n">p</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">courseDescriptionOn</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">courseTitlePosition</span><span class="p">:</span>
+            <span class="n">currentCourseDescription</span> <span class="o">+=</span> <span class="n">p</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SentenceIsLO"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.SentenceIsLO">[docs]</a><span class="k">def</span> <span class="nf">SentenceIsLO</span><span class="p">(</span><span class="n">sentence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine if the sentence meets the criteria for a learning</span>
+<span class="sd">        outcome.</span>
+
+<span class="sd">        :param sentence: a sentence from a course description</span>
+
+<span class="sd">        :return a Tuple[boolean, string]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="n">nullSentence</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">word</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">LL_VERBS</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">LL_NOUNS</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">LL_ADJECTIVES</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">LL_PHRASES</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sentence</span><span class="o">.</span><span class="n">noun_phrases</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nullSentence</span></div>
+
+
+<div class="viewcode-block" id="ExtractLearningOutcomes"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.ExtractLearningOutcomes">[docs]</a><span class="k">def</span> <span class="nf">ExtractLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span> <span class="n">courses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Course</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load each course description into BLOB and:</span>
+<span class="sd">            - get each sentence,</span>
+<span class="sd">            - tag parts of speech in each sentence,</span>
+<span class="sd">            - compare verb with Bloom Action Verbs,</span>
+<span class="sd">            - if match, select sentence as learning outcome,</span>
+<span class="sd">            - insert into global collection.</span>
+
+<span class="sd">        :param firebase: a firebase connection object</span>
+<span class="sd">        :param document: a Python-Docx Document object</span>
+<span class="sd">        :param courses: a List of Course objects</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">learningObjectives</span>
+    <span class="n">courseId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+
+        <span class="n">courseId</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+
+        <span class="n">blob</span> <span class="o">=</span> <span class="n">TextBlob</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">blob</span><span class="o">.</span><span class="n">sentences</span><span class="p">:</span>
+            <span class="n">isLO</span><span class="p">,</span> <span class="n">candidateLO</span> <span class="o">=</span> <span class="n">SentenceIsLO</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">isLO</span><span class="p">:</span>
+                <span class="n">lo</span> <span class="o">=</span> <span class="n">LearningObjective</span><span class="p">()</span>
+                <span class="n">lo</span><span class="o">.</span><span class="n">setCourseId</span><span class="p">(</span><span class="n">courseId</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+                <span class="n">lo</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">candidateLO</span><span class="p">)</span>
+                <span class="n">learningObjectives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WriteLearningOutcomes"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.WriteLearningOutcomes">[docs]</a><span class="k">def</span> <span class="nf">WriteLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">learningObjectives</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Write the LearningObjectives captured in the global list</span>
+<span class="sd">        to the database.</span>
+
+<span class="sd">        :param firebase: firebase Database Connection</span>
+<span class="sd">        :param learningObjectives: LearningObjective object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">learningObjective</span> <span class="ow">in</span> <span class="n">learningObjectives</span><span class="p">:</span>
+        <span class="n">newLearningObjective</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;CourseId&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getCourseId</span><span class="p">(),</span>
+            <span class="s1">&#39;Text&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;LearningObjective&#39;</span><span class="p">,</span> <span class="n">newLearningObjective</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">GetExistingCatalogRecords</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">documentName</span><span class="p">,</span> <span class="n">documentSemester</span><span class="p">,</span> <span class="n">documentYear</span><span class="p">)</span>
+
+    <span class="n">catalog</span> <span class="o">=</span> <span class="n">ExtractCatalogRecord</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">documentName</span><span class="p">,</span> <span class="n">documentSemester</span><span class="p">,</span> <span class="n">documentYear</span><span class="p">)</span>
+    <span class="n">catalogId</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+
+    <span class="n">GetExistingKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
+    <span class="n">ExtractKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">knowledgeAreas</span><span class="p">)</span>
+    <span class="n">ExtractCourseAndDescription</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">knowledgeAreas</span><span class="p">,</span> <span class="n">courses</span><span class="p">,</span> <span class="n">catalogId</span><span class="p">)</span>
+    <span class="n">ExtractLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">courses</span><span class="p">)</span>
+    <span class="n">WriteLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">learningObjectives</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Scholacity Parser</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../parser_package.html">parser_package package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Satterfield.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
