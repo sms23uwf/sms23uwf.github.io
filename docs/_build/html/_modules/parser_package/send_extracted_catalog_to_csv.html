@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>parser_package.send_extracted_catalog_to_csv &#8212; Scholacity Parser 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for parser_package.send_extracted_catalog_to_csv</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    send_extracted_catalog_to_csv.py</span>
+<span class="sd">    --------------------------------</span>
+
+<span class="sd">    This module contains a set of functions that read the extracted</span>
+<span class="sd">    catalog data from the database and export it to Excel format along</span>
+<span class="sd">    with the row Ids so that the data can be refined and the database</span>
+<span class="sd">    can be updated.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Steven M. Satterfield&quot;</span>
+
+<span class="kn">import</span> <span class="nn">xlsxwriter</span>
+<span class="kn">from</span> <span class="nn">firebase</span> <span class="kn">import</span> <span class="n">firebase</span>
+
+<span class="kn">from</span> <span class="nn">parser_package.knowledgearea</span> <span class="kn">import</span> <span class="n">KnowledgeArea</span>
+<span class="kn">from</span> <span class="nn">parser_package.learningobjective</span> <span class="kn">import</span> <span class="n">LearningObjective</span>
+<span class="kn">from</span> <span class="nn">parser_package.course</span> <span class="kn">import</span> <span class="n">Course</span>
+
+
+<span class="n">firebase</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">FirebaseApplication</span><span class="p">(</span><span class="s1">&#39;https://scholacity-org-test.firebaseio.com/&#39;</span><span class="p">)</span>
+
+<span class="n">knowledgeAreas</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">courses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">learningObjectives</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">workbook</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="s1">&#39;../outputs/Course_Catalog_Review.xlsx&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GetKnowledgeAreas"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.GetKnowledgeAreas">[docs]</a><span class="k">def</span> <span class="nf">GetKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get  KnowledgeAreas from the database and</span>
+<span class="sd">        insert them into the global collection.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">knowledgeAreas</span>
+
+    <span class="n">obj_key_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/KnowledgeArea&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">obj_key_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj_key_list</span><span class="p">:</span>
+        <span class="n">knowledgeArea</span> <span class="o">=</span> <span class="n">KnowledgeArea</span><span class="p">()</span>
+        <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Content&#39;</span><span class="p">])</span>
+        <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">knowledgeAreas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knowledgeArea</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GetCourses"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.GetCourses">[docs]</a><span class="k">def</span> <span class="nf">GetCourses</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Get Courses from the database and insert them into the</span>
+<span class="sd">        global collection.</span>
+
+<span class="sd">        :param firebase: A firebase connection</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">courses</span>
+    <span class="n">obj_key_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/Course&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">obj_key_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj_key_list</span><span class="p">:</span>
+        <span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="p">()</span>
+        <span class="n">course</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">course</span><span class="o">.</span><span class="n">setKnowledgeAreaId</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;KnowledgeAreaId&#39;</span><span class="p">])</span>
+        <span class="n">course</span><span class="o">.</span><span class="n">setCatalogId</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;CatalogId&#39;</span><span class="p">])</span>
+        <span class="n">course</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Name&#39;</span><span class="p">])</span>
+        <span class="n">course</span><span class="o">.</span><span class="n">setDescription</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Description&#39;</span><span class="p">])</span>
+        <span class="n">courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GetLearningObjectives"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.GetLearningObjectives">[docs]</a><span class="k">def</span> <span class="nf">GetLearningObjectives</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Get LearningObjectives from the database and insert them into the</span>
+<span class="sd">        global collection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :param firebase: A firebase connection</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">learningObjectives</span>
+    <span class="n">obj_key_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/LearningObjective&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">obj_key_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj_key_list</span><span class="p">:</span>
+        <span class="n">lo</span> <span class="o">=</span> <span class="n">LearningObjective</span><span class="p">()</span>
+        <span class="n">lo</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">lo</span><span class="o">.</span><span class="n">setCourseId</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;CourseId&#39;</span><span class="p">])</span>
+        <span class="n">lo</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Text&#39;</span><span class="p">])</span>
+        <span class="n">learningObjectives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="writeKnowledgeAreaWorksheets"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.writeKnowledgeAreaWorksheets">[docs]</a><span class="k">def</span> <span class="nf">writeKnowledgeAreaWorksheets</span><span class="p">(</span><span class="n">wb</span><span class="p">:</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Iterate through the global collection of KnowledgeAreas,</span>
+<span class="sd">        create a worksheet for each, and call method to populate</span>
+<span class="sd">        the worksheet with courses and learning objectives.</span>
+
+<span class="sd">        :param wb: Excel Workbook Object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">knowledgeAreas</span>
+
+    <span class="k">for</span> <span class="n">knowledgeArea</span> <span class="ow">in</span> <span class="n">knowledgeAreas</span><span class="p">:</span>
+        <span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">()</span>
+        <span class="n">ws</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+        <span class="n">writeWorksheet</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="writeWorksheet"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.writeWorksheet">[docs]</a><span class="k">def</span> <span class="nf">writeWorksheet</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Iterate through the global collection of KnowledgeAreas</span>
+<span class="sd">        and write them to a worksheet in an Excel workbook.</span>
+
+<span class="sd">        :param ws: Excel Worksheet Object</span>
+<span class="sd">        :param knowledgeArea: KnowledgeArea Object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">courses</span>
+    <span class="k">global</span> <span class="n">learningObjectives</span>
+
+    <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseId&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;Course&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;learningObjectiveId&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;learningObjective - As Extracted&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;learningObjective - As Revised&#39;</span><span class="p">)</span>
+
+    <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">knowledgeAreaId</span> <span class="o">=</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+        <span class="c1">#print(&quot;Course {}, {} &quot;.format(course.getTitle(), course.getKnowledgeAreaId()))</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeAreaId</span><span class="p">())</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">knowledgeAreaId</span><span class="p">):</span>
+            <span class="n">courseId</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">courseId</span><span class="p">)</span>
+                <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">())</span>
+                <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1"># write another row for the course to allow for 2 learning outcomes</span>
+                <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">courseId</span><span class="p">)</span>
+                <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">())</span>
+                <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">learningObjective</span> <span class="ow">in</span> <span class="n">learningObjectives</span><span class="p">:</span>
+                    <span class="c1">#print(&quot;LearningObjective: {}, {} &quot;.format(learningObjective.getText(), learningObjective.getCourseId()))</span>
+
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">learningObjective</span><span class="o">.</span><span class="n">getCourseId</span><span class="p">())</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">courseId</span><span class="p">):</span>
+                        <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">courseId</span><span class="p">)</span>
+                        <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">())</span>
+                        <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>
+                        <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+                        <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">continue</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">GetKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
+    <span class="n">GetCourses</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
+    <span class="n">GetLearningObjectives</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
+    
+    <span class="n">writeKnowledgeAreaWorksheets</span><span class="p">(</span><span class="n">workbook</span><span class="p">)</span>
+    <span class="n">workbook</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Scholacity Parser</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../parser_package.html">parser_package package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Satterfield.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
