@@ -86,10 +86,48 @@
         <span class="n">knowledgeAreas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knowledgeArea</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ApplyModificationToDatabase"><a class="viewcode-back" href="../../parser_package.html#parser_package.update_database_from_excel_review.ApplyModificationToDatabase">[docs]</a><span class="k">def</span> <span class="nf">ApplyModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">loId</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">modification</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ApplyCourseTitleModificationToDatabase"><a class="viewcode-back" href="../../parser_package.html#parser_package.update_database_from_excel_review.ApplyCourseTitleModificationToDatabase">[docs]</a><span class="k">def</span> <span class="nf">ApplyCourseTitleModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">titleModification</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        Thos method will receive the courseId, the learningObjectiveId,</span>
+<span class="sd">        This method will receive the courseId and the intended modifications and apply the changes to the database.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+<span class="sd">        :param courseId: str</span>
+<span class="sd">        :param titleModification: str</span>
+<span class="sd">        :param descriptionModification: str</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;courseId: </span><span class="si">{}</span><span class="s2">, titleModification: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">courseId</span><span class="p">,</span> <span class="n">titleModification</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">titleModification</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">updateLocation</span> <span class="o">=</span> <span class="s2">&quot;Course&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">courseId</span>
+        <span class="n">firebase</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">updateLocation</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="n">titleModification</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApplyCourseDescriptionModificationToDatabase"><a class="viewcode-back" href="../../parser_package.html#parser_package.update_database_from_excel_review.ApplyCourseDescriptionModificationToDatabase">[docs]</a><span class="k">def</span> <span class="nf">ApplyCourseDescriptionModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">descriptionModification</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        This method will receive the courseId and the intended modifications and apply the changes to the database.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+<span class="sd">        :param courseId: str</span>
+<span class="sd">        :param titleModification: str</span>
+<span class="sd">        :param descriptionModification: str</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;courseId: </span><span class="si">{}</span><span class="s2">, descriptionModification: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">courseId</span><span class="p">,</span> <span class="n">descriptionModification</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">descriptionModification</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">updateLocation</span> <span class="o">=</span> <span class="s2">&quot;Course&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">courseId</span>
+        <span class="n">firebase</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">updateLocation</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="n">descriptionModification</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ApplyLOModificationToDatabase"><a class="viewcode-back" href="../../parser_package.html#parser_package.update_database_from_excel_review.ApplyLOModificationToDatabase">[docs]</a><span class="k">def</span> <span class="nf">ApplyLOModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">loId</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">modification</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        This method will receive the courseId, the learningObjectiveId,</span>
 <span class="sd">        and the intended modification and apply the change to the database.</span>
 
 <span class="sd">        :param firebase: a firebase connection</span>
@@ -116,7 +154,38 @@
             <span class="n">firebase</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">updateLocation</span><span class="p">,</span> <span class="s1">&#39;Text&#39;</span><span class="p">,</span> <span class="n">modification</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="IterateSheets"><a class="viewcode-back" href="../../parser_package.html#parser_package.update_database_from_excel_review.IterateSheets">[docs]</a><span class="k">def</span> <span class="nf">IterateSheets</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ProcessCoursesWorksheet"><a class="viewcode-back" href="../../parser_package.html#parser_package.update_database_from_excel_review.ProcessCoursesWorksheet">[docs]</a><span class="k">def</span> <span class="nf">ProcessCoursesWorksheet</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        This method will iterate through the rows in the Courses worksheet</span>
+<span class="sd">        and call a method to make any indicated modifications to the database.</span>
+
+<span class="sd">        :param firebase: a firebase connection</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">workbook</span>
+
+    <span class="n">column_courseId</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">column_TitleModification</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">column_DescriptionModification</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="n">ws</span> <span class="o">=</span> <span class="n">workbook</span><span class="o">.</span><span class="n">sheet_by_index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ws</span><span class="o">.</span><span class="n">nrows</span><span class="p">):</span>
+        <span class="n">courseId</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">row_idx</span><span class="p">,</span> <span class="n">column_courseId</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">titleModification</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">row_idx</span><span class="p">,</span> <span class="n">column_TitleModification</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">descriptionModification</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">row_idx</span><span class="p">,</span> <span class="n">column_DescriptionModification</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">titleModification</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">ApplyCourseTitleModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">,</span> <span class="n">titleModification</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">descriptionModification</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">ApplyCourseDescriptionModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">,</span> <span class="n">descriptionModification</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IterateKnowledgeAreaSheets"><a class="viewcode-back" href="../../parser_package.html#parser_package.update_database_from_excel_review.IterateKnowledgeAreaSheets">[docs]</a><span class="k">def</span> <span class="nf">IterateKnowledgeAreaSheets</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        This method will iterate through all of the worksheets in the workbook</span>
@@ -142,12 +211,13 @@
             <span class="n">modification</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ws</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">row_idx</span><span class="p">,</span> <span class="n">column_modification</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">modification</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                <span class="n">ApplyModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">,</span> <span class="n">loId</span><span class="p">,</span> <span class="n">modification</span><span class="p">)</span></div>
+                <span class="n">ApplyLOModificationToDatabase</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">courseId</span><span class="p">,</span> <span class="n">loId</span><span class="p">,</span> <span class="n">modification</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">GetKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
-    <span class="n">IterateSheets</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
+    <span class="n">ProcessCoursesWorksheet</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
+    <span class="c1">#IterateKnowledgeAreaSheets(firebase)</span>
 </pre></div>
 
           </div>

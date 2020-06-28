@@ -56,9 +56,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="parser_package.html#parser_package.courses.Courses.addCourse">addCourse() (parser_package.courses.Courses method)</a>
 </li>
+      <li><a href="parser_package.html#parser_package.update_database_from_excel_review.ApplyCourseDescriptionModificationToDatabase">ApplyCourseDescriptionModificationToDatabase() (in module parser_package.update_database_from_excel_review)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="parser_package.html#parser_package.update_database_from_excel_review.ApplyModificationToDatabase">ApplyModificationToDatabase() (in module parser_package.update_database_from_excel_review)</a>
+      <li><a href="parser_package.html#parser_package.update_database_from_excel_review.ApplyCourseTitleModificationToDatabase">ApplyCourseTitleModificationToDatabase() (in module parser_package.update_database_from_excel_review)</a>
+</li>
+      <li><a href="parser_package.html#parser_package.update_database_from_excel_review.ApplyLOModificationToDatabase">ApplyLOModificationToDatabase() (in module parser_package.update_database_from_excel_review)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -118,8 +122,14 @@
 </li>
       <li><a href="parser_package.html#parser_package.course.Course.getCatalogId">getCatalogId() (parser_package.course.Course method)</a>
 </li>
-      <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.getCourseId">getCourseId() (parser_package.learningobjective.LearningObjective method)</a>
+      <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.getCourse">getCourse() (parser_package.learningobjective.LearningObjective method)</a>
 </li>
+      <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.getCourseId">getCourseId() (parser_package.learningobjective.LearningObjective method)</a>
+
+      <ul>
+        <li><a href="parser_package.html#parser_package.learningobjective_course.LearningObjective_course.getCourseId">(parser_package.learningobjective_course.LearningObjective_course method)</a>
+</li>
+      </ul></li>
       <li><a href="parser_package.html#parser_package.send_extracted_catalog_to_csv.GetCourses">GetCourses() (in module parser_package.send_extracted_catalog_to_csv)</a>
 </li>
       <li><a href="parser_package.html#parser_package.course.Course.getDescription">getDescription() (parser_package.course.Course method)</a>
@@ -145,21 +155,33 @@
 </li>
         <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.getId">(parser_package.learningobjective.LearningObjective method)</a>
 </li>
+        <li><a href="parser_package.html#parser_package.learningobjective_course.LearningObjective_course.getId">(parser_package.learningobjective_course.LearningObjective_course method)</a>
+</li>
       </ul></li>
       <li><a href="parser_package.html#parser_package.paragraph.Run.getItalic">getItalic() (parser_package.paragraph.Run method)</a>
 </li>
       <li><a href="parser_package.html#parser_package.course.Course.getKnowledgeArea">getKnowledgeArea() (parser_package.course.Course method)</a>
+
+      <ul>
+        <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.getKnowledgeArea">(parser_package.learningobjective.LearningObjective method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="parser_package.html#parser_package.course.Course.getKnowledgeAreaId">getKnowledgeAreaId() (parser_package.course.Course method)</a>
+
+      <ul>
+        <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.getKnowledgeAreaId">(parser_package.learningobjective.LearningObjective method)</a>
 </li>
+      </ul></li>
       <li><a href="parser_package.html#parser_package.send_extracted_catalog_to_csv.GetKnowledgeAreas">GetKnowledgeAreas() (in module parser_package.send_extracted_catalog_to_csv)</a>
 
       <ul>
         <li><a href="parser_package.html#parser_package.update_database_from_excel_review.GetKnowledgeAreas">(in module parser_package.update_database_from_excel_review)</a>
 </li>
       </ul></li>
+      <li><a href="parser_package.html#parser_package.learningobjective_course.LearningObjective_course.getLearningObjectiveId">getLearningObjectiveId() (parser_package.learningobjective_course.LearningObjective_course method)</a>
+</li>
       <li><a href="parser_package.html#parser_package.send_extracted_catalog_to_csv.GetLearningObjectives">GetLearningObjectives() (in module parser_package.send_extracted_catalog_to_csv)</a>
 </li>
       <li><a href="parser_package.html#parser_package.parse_catalog_into_database.getMatchingKnowledgeArea">getMatchingKnowledgeArea() (in module parser_package.parse_catalog_into_database)</a>
@@ -206,7 +228,7 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="parser_package.html#parser_package.update_database_from_excel_review.IterateSheets">IterateSheets() (in module parser_package.update_database_from_excel_review)</a>
+      <li><a href="parser_package.html#parser_package.update_database_from_excel_review.IterateKnowledgeAreaSheets">IterateKnowledgeAreaSheets() (in module parser_package.update_database_from_excel_review)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -223,6 +245,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective">LearningObjective (class in parser_package.learningobjective)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="parser_package.html#parser_package.learningobjective_course.LearningObjective_course">LearningObjective_course (class in parser_package.learningobjective_course)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -247,6 +273,8 @@
         <li><a href="parser_package.html#module-parser_package.knowledgearea">parser_package.knowledgearea</a>
 </li>
         <li><a href="parser_package.html#module-parser_package.learningobjective">parser_package.learningobjective</a>
+</li>
+        <li><a href="parser_package.html#module-parser_package.learningobjective_course">parser_package.learningobjective_course</a>
 </li>
         <li><a href="parser_package.html#module-parser_package.paragraph">parser_package.paragraph</a>
 </li>
@@ -302,8 +330,6 @@
         <li><a href="parser_package.html#module-parser_package.courses">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     parser_package.knowledgearea
 
@@ -311,11 +337,20 @@
         <li><a href="parser_package.html#module-parser_package.knowledgearea">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     parser_package.learningobjective
 
       <ul>
         <li><a href="parser_package.html#module-parser_package.learningobjective">module</a>
+</li>
+      </ul></li>
+      <li>
+    parser_package.learningobjective_course
+
+      <ul>
+        <li><a href="parser_package.html#module-parser_package.learningobjective_course">module</a>
 </li>
       </ul></li>
       <li>
@@ -346,6 +381,8 @@
         <li><a href="parser_package.html#module-parser_package.update_database_from_excel_review">module</a>
 </li>
       </ul></li>
+      <li><a href="parser_package.html#parser_package.update_database_from_excel_review.ProcessCoursesWorksheet">ProcessCoursesWorksheet() (in module parser_package.update_database_from_excel_review)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -366,8 +403,14 @@
 </li>
       <li><a href="parser_package.html#parser_package.course.Course.setCatalogId">setCatalogId() (parser_package.course.Course method)</a>
 </li>
-      <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.setCourseId">setCourseId() (parser_package.learningobjective.LearningObjective method)</a>
+      <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.setCourse">setCourse() (parser_package.learningobjective.LearningObjective method)</a>
 </li>
+      <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.setCourseId">setCourseId() (parser_package.learningobjective.LearningObjective method)</a>
+
+      <ul>
+        <li><a href="parser_package.html#parser_package.learningobjective_course.LearningObjective_course.setCourseId">(parser_package.learningobjective_course.LearningObjective_course method)</a>
+</li>
+      </ul></li>
       <li><a href="parser_package.html#parser_package.course.Course.setDescription">setDescription() (parser_package.course.Course method)</a>
 </li>
       <li><a href="parser_package.html#parser_package.catalog.Catalog.setDocumentName">setDocumentName() (parser_package.catalog.Catalog method)</a>
@@ -387,14 +430,26 @@
 </li>
         <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.setId">(parser_package.learningobjective.LearningObjective method)</a>
 </li>
+        <li><a href="parser_package.html#parser_package.learningobjective_course.LearningObjective_course.setId">(parser_package.learningobjective_course.LearningObjective_course method)</a>
+</li>
       </ul></li>
       <li><a href="parser_package.html#parser_package.paragraph.Run.setItalic">setItalic() (parser_package.paragraph.Run method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="parser_package.html#parser_package.course.Course.setKnowledgeArea">setKnowledgeArea() (parser_package.course.Course method)</a>
+
+      <ul>
+        <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.setKnowledgeArea">(parser_package.learningobjective.LearningObjective method)</a>
 </li>
+      </ul></li>
       <li><a href="parser_package.html#parser_package.course.Course.setKnowledgeAreaId">setKnowledgeAreaId() (parser_package.course.Course method)</a>
+
+      <ul>
+        <li><a href="parser_package.html#parser_package.learningobjective.LearningObjective.setKnowledgeAreaId">(parser_package.learningobjective.LearningObjective method)</a>
+</li>
+      </ul></li>
+      <li><a href="parser_package.html#parser_package.learningobjective_course.LearningObjective_course.setLearningObjectiveId">setLearningObjectiveId() (parser_package.learningobjective_course.LearningObjective_course method)</a>
 </li>
       <li><a href="parser_package.html#parser_package.paragraph.Paragraph.setNumber">setNumber() (parser_package.paragraph.Paragraph method)</a>
 </li>
@@ -430,10 +485,16 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="parser_package.html#parser_package.send_extracted_catalog_to_csv.writeCourseesWorksheet">writeCourseesWorksheet() (in module parser_package.send_extracted_catalog_to_csv)</a>
+</li>
+      <li><a href="parser_package.html#parser_package.send_extracted_catalog_to_csv.writeCourseRows">writeCourseRows() (in module parser_package.send_extracted_catalog_to_csv)</a>
+</li>
       <li><a href="parser_package.html#parser_package.send_extracted_catalog_to_csv.writeKnowledgeAreaWorksheets">writeKnowledgeAreaWorksheets() (in module parser_package.send_extracted_catalog_to_csv)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="parser_package.html#parser_package.parse_catalog_into_database.WriteLearningOutcome_Course_Records">WriteLearningOutcome_Course_Records() (in module parser_package.parse_catalog_into_database)</a>
+</li>
       <li><a href="parser_package.html#parser_package.parse_catalog_into_database.WriteLearningOutcomes">WriteLearningOutcomes() (in module parser_package.parse_catalog_into_database)</a>
 </li>
       <li><a href="parser_package.html#parser_package.send_extracted_catalog_to_csv.writeWorksheet">writeWorksheet() (in module parser_package.send_extracted_catalog_to_csv)</a>

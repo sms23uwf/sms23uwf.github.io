@@ -47,6 +47,9 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_courseId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_course</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgeAreaId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgearea</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <div class="viewcode-block" id="LearningObjective.getId"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.getId">[docs]</a>    <span class="k">def</span> <span class="nf">getId</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -60,6 +63,24 @@
 
 <div class="viewcode-block" id="LearningObjective.setCourseId"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.setCourseId">[docs]</a>    <span class="k">def</span> <span class="nf">setCourseId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">courseId</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_courseId</span> <span class="o">=</span> <span class="n">courseId</span></div>
+
+<div class="viewcode-block" id="LearningObjective.getCourse"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.getCourse">[docs]</a>    <span class="k">def</span> <span class="nf">getCourse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_course</span></div>
+
+<div class="viewcode-block" id="LearningObjective.setCourse"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.setCourse">[docs]</a>    <span class="k">def</span> <span class="nf">setCourse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_course</span> <span class="o">=</span> <span class="n">course</span></div>
+
+<div class="viewcode-block" id="LearningObjective.getKnowledgeAreaId"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.getKnowledgeAreaId">[docs]</a>    <span class="k">def</span> <span class="nf">getKnowledgeAreaId</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgeAreaId</span></div>
+
+<div class="viewcode-block" id="LearningObjective.setKnowledgeAreaId"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.setKnowledgeAreaId">[docs]</a>    <span class="k">def</span> <span class="nf">setKnowledgeAreaId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">knowledgeAreaId</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgeAreaId</span> <span class="o">=</span> <span class="n">knowledgeAreaId</span></div>
+
+<div class="viewcode-block" id="LearningObjective.getKnowledgeArea"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.getKnowledgeArea">[docs]</a>    <span class="k">def</span> <span class="nf">getKnowledgeArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgearea</span></div>
+
+<div class="viewcode-block" id="LearningObjective.setKnowledgeArea"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.setKnowledgeArea">[docs]</a>    <span class="k">def</span> <span class="nf">setKnowledgeArea</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">knowledgearea</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_knowledgearea</span> <span class="o">=</span> <span class="n">knowledgearea</span></div>
 
 <div class="viewcode-block" id="LearningObjective.getText"><a class="viewcode-back" href="../../parser_package.html#parser_package.learningobjective.LearningObjective.getText">[docs]</a>    <span class="k">def</span> <span class="nf">getText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_text</span></div>

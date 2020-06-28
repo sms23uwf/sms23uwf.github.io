@@ -56,9 +56,10 @@
 <span class="kn">from</span> <span class="nn">parser_package.knowledgearea</span> <span class="kn">import</span> <span class="n">KnowledgeArea</span>
 <span class="kn">from</span> <span class="nn">parser_package.course</span> <span class="kn">import</span> <span class="n">Course</span>
 <span class="kn">from</span> <span class="nn">parser_package.learningobjective</span> <span class="kn">import</span> <span class="n">LearningObjective</span>
+<span class="kn">from</span> <span class="nn">parser_package.learningobjective_course</span> <span class="kn">import</span> <span class="n">LearningObjective_course</span>
 <span class="kn">from</span> <span class="nn">parser_package.paragraph</span> <span class="kn">import</span> <span class="n">Paragraph</span>
 <span class="kn">import</span> <span class="nn">parser_package.constant</span>
-
+<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="n">existingCatalogRecords</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">existingKnowledgeAreas</span> <span class="o">=</span> <span class="p">[]</span>
@@ -133,7 +134,7 @@
                 <span class="n">pPrevIsBold</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span> <span class="k">if</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">runs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bold</span> <span class="k">else</span> <span class="s1">&#39;false&#39;</span>
 
         <span class="k">if</span> <span class="n">pPrevText</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">constant</span><span class="o">.</span><span class="n">STYLE_NORMAL</span> <span class="ow">and</span> <span class="n">pPrevIsBold</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pPrevText</span><span class="p">[</span><span class="n">pPrevLasPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_NORMAL</span> <span class="ow">and</span> <span class="n">pPrevIsBold</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pPrevText</span><span class="p">[</span><span class="n">pPrevLasPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()):</span>
                 <span class="k">if</span> <span class="n">firstPositionOfCKA</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">firstPositionOfCKA</span> <span class="o">=</span> <span class="n">i</span>
 
@@ -248,7 +249,7 @@
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj_key_list</span><span class="p">:</span>
         <span class="n">knowledgeArea</span> <span class="o">=</span> <span class="n">KnowledgeArea</span><span class="p">()</span>
-        <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Content&#39;</span><span class="p">])</span>
+        <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
         <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="n">existingKnowledgeAreas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">knowledgeArea</span><span class="p">)</span></div>
 
@@ -285,7 +286,7 @@
 
     <span class="k">for</span> <span class="n">knowledgeArea</span> <span class="ow">in</span> <span class="n">knowledgeAreas</span><span class="p">:</span>
         <span class="n">newKnowledgeArea</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;Content&#39;</span><span class="p">:</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
         <span class="p">}</span>
 
         <span class="n">existingKey</span> <span class="o">=</span> <span class="n">FindExistingKnowledgeAreaId</span><span class="p">(</span><span class="n">knowledgeArea</span><span class="p">)</span>
@@ -348,8 +349,6 @@
             <span class="k">if</span> <span class="n">candidateId</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                 <span class="n">knowledgeAreaId</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">candidateId</span><span class="p">)</span>
                 <span class="n">knowledgeAreaTitle</span> <span class="o">=</span> <span class="n">currentKnowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;knowledgeAreaId:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">knowledgeAreaId</span><span class="p">))</span>
-
         <span class="k">else</span><span class="p">:</span>
             <span class="n">knowledgeAreaId</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
@@ -379,26 +378,26 @@
     <span class="n">ExtractCourseDescriptions</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">courses</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New!&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
             <span class="n">pNumber</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">descriptionElements</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">:</span>
                 <span class="n">pNumber</span> <span class="o">+=</span> <span class="mi">1</span>
+                    
                 <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">courseNameStyles</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                    <span class="n">pText</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New! &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">())</span> <span class="ow">or</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">pText</span><span class="p">):</span>
+                    <span class="n">pText</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New! &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">pText</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span> <span class="ow">or</span> <span class="n">courseTitle</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">pText</span><span class="p">):</span>
                         <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">takeDescription</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;Sessions&quot;</span><span class="p">):</span>
-                            <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">1</span>
-                        <span class="k">if</span> <span class="n">takeDescription</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;Magic&quot;</span><span class="p">):</span>
-                            <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">1</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">takeDescription</span> <span class="o">=</span> <span class="mi">0</span>
 
                 <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">parser_package</span><span class="o">.</span><span class="n">constant</span><span class="o">.</span><span class="n">STYLE_BODY_TEXT</span> <span class="ow">and</span> <span class="n">takeDescription</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="c1">#print(&quot;taking {} as course description for course: {}&quot;.format(p.text.strip(), course.getTitle()))</span>
                     <span class="n">descriptionElements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 
             <span class="n">fullDescription</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span>
@@ -409,14 +408,17 @@
             <span class="n">course</span><span class="o">.</span><span class="n">setDescription</span><span class="p">(</span><span class="n">fullDescription</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;course: </span><span class="si">{}</span><span class="s2"> has no description&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()))</span>
+
         <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeArea</span><span class="p">()</span> <span class="o">==</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">():</span>
             <span class="k">continue</span>
 
         <span class="n">newCourse</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;CatalogId&#39;</span><span class="p">:</span> <span class="n">catalogId</span><span class="p">,</span>
-            <span class="s1">&#39;KnowledgeAreaId&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeAreaId</span><span class="p">(),</span>
-            <span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">(),</span>
-            <span class="s1">&#39;Description&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span>
+            <span class="s1">&#39;catalogid&#39;</span><span class="p">:</span> <span class="n">catalogId</span><span class="p">,</span>
+            <span class="s1">&#39;knowledgeareaid&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeAreaId</span><span class="p">(),</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">(),</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">()</span>
         <span class="p">}</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;Course&#39;</span><span class="p">,</span> <span class="n">newCourse</span><span class="p">)</span>
         <span class="n">course</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
@@ -434,11 +436,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">candidate</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New!&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">candidate</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
 
     <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
 
         <span class="n">compareThis</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New!&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
         <span class="n">lastPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">courseTitle</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
@@ -464,6 +471,23 @@
                     <span class="k">for</span> <span class="n">titlePart</span> <span class="ow">in</span> <span class="n">compareThis</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">titlePart</span> <span class="ow">in</span> <span class="n">candidate</span><span class="p">:</span>
                             <span class="k">return</span> <span class="kc">True</span>
+                        <span class="k">if</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">titlePart</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="n">courseTitlePostCol</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">candidatePostCol</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">lastCandidatePos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">courseTitle</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">courseTitle</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">courseTitlePostCol</span> <span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">candidate</span><span class="p">[</span><span class="n">lastCandidatePos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">candidatePostCol</span> <span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">candidatePostCol</span> <span class="o">==</span> <span class="n">courseTitlePostCol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="kc">False</span></div>
 
@@ -479,16 +503,24 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">candidate</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New! &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">maybeCourseTitle</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">maybeCourseTitle</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
 
         <span class="n">compareThis</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">courseTitle</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;New!&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">lastPos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">courseTitle</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
 
+            <span class="c1">#if courseTitle.lower().__contains__(&quot;culinary&quot;):</span>
+                <span class="c1">#print(&quot;inside GetAssociatedCourse with candidate: {} and courseTitle: {}&quot;.format(maybeCourseTitle.replace(&quot;&#39;&quot;,&quot;&quot;), courseTitle))</span>
+            
+            <span class="k">if</span> <span class="n">maybeCourseTitle</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">course</span>
+            
             <span class="k">if</span> <span class="n">courseTitle</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">courseTitle</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
                 <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
@@ -497,8 +529,24 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">compareThis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">courseTitle</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ele</span> <span class="ow">in</span> <span class="n">candidate</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">compareThis</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ele</span> <span class="ow">in</span> <span class="n">maybeCourseTitle</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">compareThis</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">course</span>
+
+            <span class="n">courseTitlePostCol</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">candidatePostCol</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">lastCandidatePos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">courseTitle</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">courseTitle</span><span class="p">[</span><span class="n">lastPos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">courseTitle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">courseTitlePostCol</span> <span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">candidate</span><span class="p">[</span><span class="n">lastCandidatePos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">candidatePostCol</span> <span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">candidatePostCol</span> <span class="o">==</span> <span class="n">courseTitlePostCol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">course</span>                
+
 
     <span class="n">nullCourse</span> <span class="o">=</span> <span class="n">Course</span><span class="p">()</span>
     <span class="n">nullCourse</span><span class="o">.</span><span class="n">setKnowledgeArea</span> <span class="o">=</span> <span class="s2">&quot;No Match&quot;</span>
@@ -523,7 +571,7 @@
     <span class="n">pertinentParagraphs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">pHeader</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">headerIsCourseTitle</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">hIsCourseTitle</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">partialTitle</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">global</span> <span class="n">courseNameStyles</span>
@@ -562,9 +610,9 @@
                 <span class="n">paragraphs2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
                 <span class="n">pHeader</span> <span class="o">=</span> <span class="n">pPrev</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">pHeader</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                    <span class="n">headerIsCourseTitle</span> <span class="o">=</span> <span class="n">HeaderIsCourseTitle</span><span class="p">(</span><span class="n">pHeader</span><span class="p">)</span>
+                    <span class="n">hIsCourseTitle</span> <span class="o">=</span> <span class="n">HeaderIsCourseTitle</span><span class="p">(</span><span class="n">pHeader</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">headerIsCourseTitle</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">hIsCourseTitle</span><span class="p">:</span>
                 <span class="n">number</span> <span class="o">=</span> <span class="n">number</span> <span class="o">+</span> <span class="mi">1</span>
                 <span class="n">pc</span> <span class="o">=</span> <span class="n">Paragraph</span><span class="p">()</span>
                 <span class="n">pc</span><span class="o">.</span><span class="n">setNumber</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
@@ -578,6 +626,9 @@
     <span class="n">courseTitlePosition</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pertinentParagraphs</span><span class="p">):</span>
+        <span class="c1">#if p.getHeader().strip() != &quot;&quot;:</span>
+            <span class="c1">#print(&quot;paragraph header: {}&quot;.format(p.getHeader().strip()))</span>
+            
         <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">getHeader</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">courseDescriptionOn</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">courseTitlePosition</span><span class="p">:</span>
             <span class="n">associatedCourse</span><span class="o">.</span><span class="n">setDescription</span><span class="p">(</span><span class="n">currentCourseDescription</span><span class="p">)</span>
             <span class="n">courseDescriptionOn</span> <span class="o">=</span> <span class="kc">False</span>
@@ -585,7 +636,7 @@
             <span class="n">courseTitlePosition</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">getHeader</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">courseDescriptionOn</span><span class="p">:</span>
             <span class="n">courseDescriptionOn</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">associatedCourse</span> <span class="o">=</span> <span class="n">GetAssociatedCourse</span><span class="p">(</span><span class="n">courses</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">getHeader</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">associatedCourse</span> <span class="o">=</span> <span class="n">GetAssociatedCourse</span><span class="p">(</span><span class="n">courses</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">getHeader</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
             <span class="n">courseTitlePosition</span> <span class="o">=</span> <span class="n">i</span>
             <span class="n">currentCourseDescription</span> <span class="o">+=</span> <span class="n">p</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">courseDescriptionOn</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">courseTitlePosition</span><span class="p">:</span>
@@ -650,40 +701,94 @@
                 <span class="n">lo</span> <span class="o">=</span> <span class="n">LearningObjective</span><span class="p">()</span>
                 <span class="n">lo</span><span class="o">.</span><span class="n">setCourseId</span><span class="p">(</span><span class="n">courseId</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
                 <span class="n">lo</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">candidateLO</span><span class="p">)</span>
+                <span class="n">lo</span><span class="o">.</span><span class="n">setKnowledgeAreaId</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeAreaId</span><span class="p">())</span>
                 <span class="n">learningObjectives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="WriteLearningOutcomes"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.WriteLearningOutcomes">[docs]</a><span class="k">def</span> <span class="nf">WriteLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">learningObjectives</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="WriteLearningOutcomes"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.WriteLearningOutcomes">[docs]</a><span class="k">def</span> <span class="nf">WriteLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">learningObjectives</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObjective</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Write the LearningObjectives captured in the global list</span>
 <span class="sd">        to the database.</span>
 
 <span class="sd">        :param firebase: firebase Database Connection</span>
-<span class="sd">        :param learningObjectives: LearningObjective object</span>
+<span class="sd">        :param learningObjectives: LearningObjective object list</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">for</span> <span class="n">learningObjective</span> <span class="ow">in</span> <span class="n">learningObjectives</span><span class="p">:</span>
         <span class="n">newLearningObjective</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;CourseId&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getCourseId</span><span class="p">(),</span>
-            <span class="s1">&#39;Text&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+            <span class="s1">&#39;courseid&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getCourseId</span><span class="p">(),</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getText</span><span class="p">(),</span>
+            <span class="s1">&#39;knowledgeareaid&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getKnowledgeAreaId</span><span class="p">()</span>
         <span class="p">}</span>
-        <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;LearningObjective&#39;</span><span class="p">,</span> <span class="n">newLearningObjective</span><span class="p">)</span></div>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;LearningObjective&#39;</span><span class="p">,</span> <span class="n">newLearningObjective</span><span class="p">)</span>
+        <span class="n">learningObjective</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span></div>
+        
 
+<div class="viewcode-block" id="WriteLearningOutcome_Course_Records"><a class="viewcode-back" href="../../parser_package.html#parser_package.parse_catalog_into_database.WriteLearningOutcome_Course_Records">[docs]</a><span class="k">def</span> <span class="nf">WriteLearningOutcome_Course_Records</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">,</span> <span class="n">learningObjectives</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObjective</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        Write the learningobjective_course bridge table</span>
+<span class="sd">        </span>
+<span class="sd">        :param firebase: firebase Database Connection</span>
+<span class="sd">        :param learningObjectives: LearningObjective object list</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">learningObjective</span> <span class="ow">in</span> <span class="n">learningObjectives</span><span class="p">:</span>
+        <span class="n">newLearningObjective_Course</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;courseid&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getCourseId</span><span class="p">(),</span>
+            <span class="s1">&#39;learningobjectiveid&#39;</span><span class="p">:</span> <span class="n">learningObjective</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">firebase</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;LearningObjective_course&#39;</span><span class="p">,</span> <span class="n">newLearningObjective_Course</span><span class="p">)</span></div>
+    
+    
+    
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
+    <span class="n">tStart</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">,</span> <span class="n">tStart</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Current Time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_time</span><span class="p">))</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check database for existing Catalog Records.&quot;</span><span class="p">)</span>
     <span class="n">GetExistingCatalogRecords</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">documentName</span><span class="p">,</span> <span class="n">documentSemester</span><span class="p">,</span> <span class="n">documentYear</span><span class="p">)</span>
 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extract Catalog Record from current document.&quot;</span><span class="p">)</span>
     <span class="n">catalog</span> <span class="o">=</span> <span class="n">ExtractCatalogRecord</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">documentName</span><span class="p">,</span> <span class="n">documentSemester</span><span class="p">,</span> <span class="n">documentYear</span><span class="p">)</span>
     <span class="n">catalogId</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check database for existing Knowledge Areas.&quot;</span><span class="p">)</span>
     <span class="n">GetExistingKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extract Knowledge Areas from the current document.&quot;</span><span class="p">)</span>
     <span class="n">ExtractKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">knowledgeAreas</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extract Courses and Descriptions from the current document.&quot;</span><span class="p">)</span>
     <span class="n">ExtractCourseAndDescription</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">knowledgeAreas</span><span class="p">,</span> <span class="n">courses</span><span class="p">,</span> <span class="n">catalogId</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extract stated Learning Objectives from the current document.&quot;</span><span class="p">)</span>
     <span class="n">ExtractLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">courses</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Write the extracted Learning Objectives to the Database.&quot;</span><span class="p">)</span>
     <span class="n">WriteLearningOutcomes</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">learningObjectives</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Write the LearningObjective_Course bridge table.&quot;</span><span class="p">)</span>
+    <span class="n">WriteLearningOutcome_Course_Records</span><span class="p">(</span><span class="n">firebase</span><span class="p">,</span> <span class="n">learningObjectives</span><span class="p">)</span>
+    
+    <span class="n">tEnd</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">,</span> <span class="n">tEnd</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Current Time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_time</span><span class="p">))</span>
+
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">tElapsed</span> <span class="o">=</span> <span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time elapsed in seconds: </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tElapsed</span><span class="p">))</span>
+
+
 </pre></div>
 
           </div>
