@@ -59,6 +59,7 @@
 <span class="n">learningObjectives</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="n">workbook</span> <span class="o">=</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="s1">&#39;../outputs/Course_Catalog_Review.xlsx&#39;</span><span class="p">)</span>
+<span class="n">coursesWsRow</span> <span class="o">=</span> <span class="mi">0</span>
 
 
 <div class="viewcode-block" id="GetKnowledgeAreas"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.GetKnowledgeAreas">[docs]</a><span class="k">def</span> <span class="nf">GetKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">:</span> <span class="n">firebase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -150,6 +151,80 @@
         <span class="n">lo</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;Text&#39;</span><span class="p">])</span>
         <span class="n">learningObjectives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="writeCourseesWorksheet"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.writeCourseesWorksheet">[docs]</a><span class="k">def</span> <span class="nf">writeCourseesWorksheet</span><span class="p">(</span><span class="n">wb</span><span class="p">:</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Write a separate worksheet for all courses.</span>
+
+<span class="sd">        :param wb: Excel Workbook Object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">knowledgeAreas</span>
+    <span class="k">global</span> <span class="n">coursesWsRow</span>
+
+
+    <span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">()</span>
+    <span class="n">ws</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Courses&quot;</span>
+
+    <span class="n">row</span> <span class="o">=</span> <span class="n">coursesWsRow</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;LearningObjective&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseId&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseTitle - As Extracted&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseTitle - As Revised&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseDescription - As Extracted&#39;</span><span class="p">)</span>
+    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseDescription - As Revised&#39;</span><span class="p">)</span>
+
+    <span class="n">coursesWsRow</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">knowledgeArea</span> <span class="ow">in</span> <span class="n">knowledgeAreas</span><span class="p">:</span>
+        <span class="n">writeCourseRows</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="writeCourseRows"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.writeCourseRows">[docs]</a><span class="k">def</span> <span class="nf">writeCourseRows</span><span class="p">(</span><span class="n">ws</span><span class="p">:</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">worksheet</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="p">:</span> <span class="n">KnowledgeArea</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Write the rows in the courses worksheet for all courses under</span>
+<span class="sd">        the knowledgearea.</span>
+
+<span class="sd">        :param ws: Excel Worksheet Object</span>
+<span class="sd">        :param knowledgeArea: KnowledgeArea</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">global</span> <span class="n">courses</span>
+    <span class="k">global</span> <span class="n">coursesWsRow</span>
+
+    <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">knowledgeAreaId</span> <span class="o">=</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">getKnowledgeAreaId</span><span class="p">())</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">knowledgeAreaId</span><span class="p">):</span>
+            <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">coursesWsRow</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
+            <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">courseId</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+            <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">coursesWsRow</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">courseId</span><span class="p">)</span>
+            <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">coursesWsRow</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">getTitle</span><span class="p">())</span>
+            <span class="n">col</span> <span class="o">+=</span> <span class="mi">2</span>
+            <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">coursesWsRow</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">getDescription</span><span class="p">())</span>
+            <span class="n">coursesWsRow</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span></div>
+
 
 <div class="viewcode-block" id="writeKnowledgeAreaWorksheets"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.writeKnowledgeAreaWorksheets">[docs]</a><span class="k">def</span> <span class="nf">writeKnowledgeAreaWorksheets</span><span class="p">(</span><span class="n">wb</span><span class="p">:</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -166,11 +241,11 @@
 
     <span class="k">for</span> <span class="n">knowledgeArea</span> <span class="ow">in</span> <span class="n">knowledgeAreas</span><span class="p">:</span>
         <span class="n">ws</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">add_worksheet</span><span class="p">()</span>
-        <span class="n">ws</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+        <span class="n">ws</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">knowledgeArea</span><span class="o">.</span><span class="n">getText</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">31</span><span class="p">]</span>
         <span class="n">writeWorksheet</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="writeWorksheet"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.writeWorksheet">[docs]</a><span class="k">def</span> <span class="nf">writeWorksheet</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="p">):</span>
+<div class="viewcode-block" id="writeWorksheet"><a class="viewcode-back" href="../../parser_package.html#parser_package.send_extracted_catalog_to_csv.writeWorksheet">[docs]</a><span class="k">def</span> <span class="nf">writeWorksheet</span><span class="p">(</span><span class="n">ws</span><span class="p">:</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">worksheet</span><span class="p">,</span> <span class="n">knowledgeArea</span><span class="p">:</span> <span class="n">KnowledgeArea</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Iterate through the global collection of KnowledgeAreas</span>
@@ -190,7 +265,7 @@
     <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseId&#39;</span><span class="p">)</span>
     <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;Course&#39;</span><span class="p">)</span>
+    <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;CourseTitle - As Extracted&#39;</span><span class="p">)</span>
     <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="n">ws</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;learningObjectiveId&#39;</span><span class="p">)</span>
@@ -244,7 +319,8 @@
     <span class="n">GetKnowledgeAreas</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
     <span class="n">GetCourses</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
     <span class="n">GetLearningObjectives</span><span class="p">(</span><span class="n">firebase</span><span class="p">)</span>
-    
+
+    <span class="n">writeCourseesWorksheet</span><span class="p">(</span><span class="n">workbook</span><span class="p">)</span>
     <span class="n">writeKnowledgeAreaWorksheets</span><span class="p">(</span><span class="n">workbook</span><span class="p">)</span>
     <span class="n">workbook</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
